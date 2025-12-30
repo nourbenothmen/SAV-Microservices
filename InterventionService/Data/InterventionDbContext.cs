@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using InterventionService.Models;
+﻿using InterventionService.Models;
+using InterventionService.Models.InterventionService.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace InterventionService.Data
 {
@@ -18,6 +19,7 @@ namespace InterventionService.Data
 
         public DbSet<Intervention> Interventions { get; set; }
         public DbSet<InterventionPart> InterventionParts { get; set; }
+        public DbSet<Technicien> Techniciens { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

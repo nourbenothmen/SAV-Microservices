@@ -23,5 +23,7 @@ namespace CustomerService.Services
 
         // Supprimer un client (ResponsableSAV uniquement)
         Task<bool> DeleteCustomerAsync(int id);
+
+
     }
 }

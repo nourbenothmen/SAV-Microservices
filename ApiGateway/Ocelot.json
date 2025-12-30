@@ -29,8 +29,31 @@
         }
       ],
       "UpstreamPathTemplate": "/apigateway/customers",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
     },
+    {
+      "DownstreamPathTemplate": "/api/customers/register",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7151
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/customers/register",
+      "UpstreamHttpMethod": [ "POST" ]
+      // Pas d'AuthenticationOptions → pas de token requis
+    },
+
     {
       "DownstreamPathTemplate": "/api/customers/{id}",
       "DownstreamScheme": "https",
@@ -41,8 +64,18 @@
         }
       ],
       "UpstreamPathTemplate": "/apigateway/customers/{id}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
     },
+
     {
       "DownstreamPathTemplate": "/api/customers/me",
       "DownstreamScheme": "https",
@@ -53,8 +86,151 @@
         }
       ],
       "UpstreamPathTemplate": "/apigateway/customers/me",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET" ],
+
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
     },
+    {
+      "DownstreamPathTemplate": "/api/customers/me/client-id",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7151 // port de CustomerService
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/customers/me/client-id",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    // ============================================
+    // CUSTOMER ARTICLES (ArticleService) — Port 7087
+    // ============================================
+
+    {
+      "DownstreamPathTemplate": "/api/CustomerArticles/my",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7087
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/articles/my",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/CustomerArticles",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7087
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/articles/client",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/CustomerArticles/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7087
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/articles/client/{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/CustomerArticles/client/{clientId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7087
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/articles/client/by-client/{clientId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/CustomerArticles/serial/{numeroSerie}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7087
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/articles/client/serial/{numeroSerie}",
+      "UpstreamHttpMethod": [ "GET" ]
+      // Pas d'authentification ici car ton endpoint est [AllowAnonymous]
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/CustomerArticles/client/{clientId}/sous-garantie",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7087
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/articles/client/{clientId}/sous-garantie",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+    },
+
 
     // ============================================
     // RECLAMATIONS — Port 7151
@@ -69,7 +245,15 @@
         }
       ],
       "UpstreamPathTemplate": "/apigateway/reclamations",
-      "UpstreamHttpMethod": [ "GET", "POST" ]
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+
     },
     {
       "DownstreamPathTemplate": "/api/reclamations/my",
@@ -81,7 +265,15 @@
         }
       ],
       "UpstreamPathTemplate": "/apigateway/reclamations/my",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+
     },
     {
       "DownstreamPathTemplate": "/api/reclamations/{id}",
@@ -93,7 +285,35 @@
         }
       ],
       "UpstreamPathTemplate": "/apigateway/reclamations/{id}",
-      "UpstreamHttpMethod": [ "GET" ]
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+
+    },
+    {
+      "DownstreamPathTemplate": "/api/reclamations/{id}/status",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7151
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/reclamations/{id}/status",
+      "UpstreamHttpMethod": [ "PATCH" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+
     },
 
     {
@@ -122,11 +342,8 @@
         }
       ],
       "UpstreamPathTemplate": "/apigateway/articles/{id}",
-      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE", "PATCH" ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      }
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE", "PATCH" ]
+
     },
     {
       "DownstreamPathTemplate": "/api/Articles/reference/{reference}",
@@ -205,7 +422,7 @@
       }
     },
     // ============================================
-    // INTERVENTION SERVICE — Port 7170
+    // INTERVENTION SERVICE — Port 7134
     // ============================================
     {
       "DownstreamPathTemplate": "/api/interventions",
@@ -213,11 +430,44 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7170
+          "Port": 7134
         }
       ],
       "UpstreamPathTemplate": "/apigateway/interventions",
       "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/interventions/{id}/status",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/interventions/{id}/status",
+      "UpstreamHttpMethod": [ "PATCH" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+
+    {
+      "DownstreamPathTemplate": "/api/interventions/{id}/details",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/interventions/{id}/details",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
@@ -229,7 +479,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7170
+          "Port": 7134
         }
       ],
       "UpstreamPathTemplate": "/apigateway/interventions/{id}",
@@ -245,7 +495,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
-          "Port": 7170
+          "Port": 7134
         }
       ],
       "UpstreamPathTemplate": "/apigateway/interventions/my",
@@ -254,7 +504,94 @@
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
       }
+    },
+    // ============================================
+    // CRUD TECHNICIENS — Port 7134
+    // ============================================
+    {
+      "DownstreamPathTemplate": "/api/techniciens",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/techniciens",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": { "Authorization": "Bearer {Authorization}" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/techniciens/{id}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/techniciens/{id}",
+      "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": { "Authorization": "Bearer {Authorization}" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/dashboard/reclamations/stats",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7151
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/dashboard/reclamations/stats",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/dashboard/interventions/today",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/dashboard/interventions/today",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/dashboard/client/stats",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7151
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/dashboard/client/stats",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      }
     }
+
+
 
   ],
 

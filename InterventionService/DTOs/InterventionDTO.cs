@@ -4,47 +4,46 @@ using System.ComponentModel.DataAnnotations;
 namespace InterventionService.DTOs
 {
     public class InterventionDTO
-    {
-        public int Id { get; set; }
+        {
+            public int Id { get; set; }
+            [Required]
+            public int ReclamationId { get; set; }
+            [Required]
+            public int ClientId { get; set; }
+            public string ClientNom { get; set; } = string.Empty;
+            public string? ClientAddress { get; set; }       // ← Ajouté
+            public string? ClientTelephone { get; set; }   // ← Ajouté
+            [Required]
+            public int ArticleId { get; set; }
+            public string ArticleNom { get; set; } = string.Empty;
+            [Required]
+            [StringLength(200)]
+            public string Description { get; set; } = string.Empty;
+            [Required]
+            public DateTime DateIntervention { get; set; }
+            [Required]
+            [StringLength(50)]
+            public string Statut { get; set; } = "Planifiée";
+            public bool EstSousGarantie { get; set; }
+            public decimal MontantMainOeuvre { get; set; }
+            public decimal MontantTotal { get; set; }
+            [StringLength(500)]
+            public string? Commentaire { get; set; }
+            [Required]
+            [StringLength(100)]
+            public string TechnicienNom { get; set; } = string.Empty;
+            public DateTime DateCreation { get; set; }
+            public DateTime? DateMiseAJour { get; set; }
+            public List<InterventionPartDTO> Pieces { get; set; } = new();
 
-        [Required]
-        public int ReclamationId { get; set; }
-
-        [Required]
-        public int ClientId { get; set; }
-
-        [Required]
-        public int ArticleId { get; set; }
-
-        [Required]
-        [StringLength(200)]
-        public string Description { get; set; } = string.Empty;
-
-        [Required]
-        public DateTime DateIntervention { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string Statut { get; set; } = "Planifiée";
-
-        public bool EstSousGarantie { get; set; }
-
-        public decimal MontantMainOeuvre { get; set; }
-
-        public decimal MontantTotal { get; set; }
-
-        [StringLength(500)]
-        public string? Commentaire { get; set; }
-
-        [Required]
-        [StringLength(100)]
-        public string TechnicienNom { get; set; } = string.Empty;
-
-        public DateTime DateCreation { get; set; }
-
-        public DateTime? DateMiseAJour { get; set; }
-
-        public List<InterventionPartDTO> Pieces { get; set; } = new();
+            // Champs facturation (déjà présents dans ton modèle)
+            public decimal DureeIntervention { get; set; }
+            public decimal TarifHoraire { get; set; }
+            public decimal MontantDeplacement { get; set; }
+            public decimal TauxTVA { get; set; }
+            public string? ModePaiement { get; set; }
+            public string? StatutPaiement { get; set; }
+        
     }
 
     public class CreateInterventionDTO

@@ -15,9 +15,12 @@ namespace CustomerService.Models
 
         // Navigation
         public Customer Customer { get; set; } = null!;
-        public DateTime ResolvedAt { get; internal set; }
+        public DateTime? ResolvedAt { get; set; }
+
         public int ArticleId { get; internal set; }
         public int? InterventionId { get; internal set; }
+        public string? ProblemType { get; set; }                    // nouveau
+        public DateTime? DesiredInterventionDate { get; set; }
     }
 
 }

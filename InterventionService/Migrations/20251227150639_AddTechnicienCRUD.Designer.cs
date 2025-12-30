@@ -4,6 +4,7 @@ using InterventionService.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace InterventionService.Migrations
 {
     [DbContext(typeof(InterventionDbContext))]
-    partial class InterventionDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251227150639_AddTechnicienCRUD")]
+    partial class AddTechnicienCRUD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,18 +57,8 @@ namespace InterventionService.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<decimal>("DureeIntervention")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<bool>("EstSousGarantie")
                         .HasColumnType("bit");
-
-                    b.Property<string>("ModePaiement")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("MontantDeplacement")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("MontantMainOeuvre")
                         .HasPrecision(18, 2)
@@ -82,16 +75,6 @@ namespace InterventionService.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("StatutPaiement")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<decimal>("TarifHoraire")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("TauxTVA")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TechnicienNom")
                         .IsRequired()
@@ -143,6 +126,7 @@ namespace InterventionService.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Reference")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 

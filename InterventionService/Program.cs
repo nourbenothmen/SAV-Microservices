@@ -1,4 +1,4 @@
-using InterventionService.Data;
+﻿using InterventionService.Data;
 using InterventionService.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -24,6 +24,13 @@ builder.Services.AddDbContext<InterventionDbContext>(options =>
 
 // Add Intervention Service
 builder.Services.AddScoped<IInterventionService, InterventionServiceImpl>();
+// Enregistrement du service TechnicienService pour l'injection de dépendance
+builder.Services.AddScoped<TechnicienService>();
+// ✅ AJOUTE ICI
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+
+
 
 // Configuration de l'authentification JWT
 var jwtKey = builder.Configuration["Jwt:Key"] ?? "YourSuperSecretKeyForJWT2024!@#$%";

@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using InterventionService.DTOs;
 using InterventionService.Models;
 using InterventionService.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InterventionService.Controllers
 {
@@ -18,6 +19,39 @@ namespace InterventionService.Controllers
             _interventionService = interventionService;
             _logger = logger;
         }
+
+
+
+
+        /// <summary>
+        /// Met à jour uniquement le statut d'une intervention
+        /// </summary>
+        [HttpPatch("{id}/status")]
+        [Authorize(Roles = "ResponsableSAV")]
+        public async Task<ActionResult<Intervention>> UpdateInterventionStatus(int id, [FromBody] UpdateStatutDTO dto)
+        {
+            try
+            {
+                var intervention = await _interventionService.GetInterventionByIdAsync(id);
+                if (intervention == null)
+                {
+                    return NotFound($"Intervention avec l'ID {id} non trouvée");
+                }
+
+                intervention.Statut = dto.Statut;
+                intervention.DateMiseAJour = DateTime.Now;
+
+                var updatedIntervention = await _interventionService.UpdateInterventionAsync(id, intervention);
+
+                return Ok(updatedIntervention);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la mise à jour du statut de l'intervention {Id}", id);
+                return StatusCode(500, "Une erreur est survenue lors de la mise à jour du statut");
+            }
+        }
+
 
         /// <summary>
         /// Récupère toutes les interventions (Admin et Responsable SAV seulement)
@@ -38,6 +72,14 @@ namespace InterventionService.Controllers
             }
         }
 
+
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<InterventionDTO>> GetInterventionDetails(int id)
+        {
+            var details = await _interventionService.GetInterventionDetailsAsync(id);
+            if (details == null) return NotFound();
+            return Ok(details);
+        }
         /// <summary>
         /// Récupère une intervention par son ID
         /// </summary>
@@ -257,5 +299,79 @@ namespace InterventionService.Controllers
                 return StatusCode(500, "Une erreur est survenue lors du calcul du coût");
             }
         }
+
+
+        /// <summary>
+        /// Ajoute ou met à jour une pièce dans une intervention
+        /// </summary>
+        [HttpPut("{id}/parts")]
+        [Authorize(Roles = "ResponsableSAV")]
+        public async Task<ActionResult<InterventionPart>> AddOrUpdatePart(int id, [FromBody] InterventionPart part)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                part.InterventionId = id;
+                part.PrixTotal = part.Quantite * part.PrixUnitaire;
+
+                var updatedPart = await _interventionService.AddOrUpdatePartAsync(part);
+                if (updatedPart == null)
+                    return NotFound($"Intervention {id} ou pièce non trouvée");
+
+                return Ok(updatedPart);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de l'ajout/mise à jour de la pièce pour l'intervention {Id}", id);
+                return StatusCode(500, "Erreur serveur");
+            }
+        }
+
+        /// <summary>
+        /// Supprime une pièce d'une intervention
+        /// </summary>
+        [HttpDelete("parts/{partId}")]
+        [Authorize(Roles = "ResponsableSAV")]
+        public async Task<IActionResult> DeletePart(int partId)
+        {
+            try
+            {
+                var success = await _interventionService.DeletePartAsync(partId);
+                if (!success)
+                    return NotFound($"Pièce avec l'ID {partId} non trouvée");
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la suppression de la pièce {PartId}", partId);
+                return StatusCode(500, "Erreur serveur");
+            }
+        }
+
+        /// <summary>
+        /// Clôture une intervention hors garantie avec calcul de facture
+        /// </summary>
+        [HttpPut("{id}/close")]
+        [Authorize(Roles = "ResponsableSAV")]
+        public async Task<ActionResult<Intervention>> CloseIntervention(int id, [FromBody] CloseInterventionDTO dto)
+        {
+            try
+            {
+                var closedIntervention = await _interventionService.CloseInterventionAsync(id, dto);
+                if (closedIntervention == null)
+                    return NotFound($"Intervention {id} non trouvée");
+
+                return Ok(closedIntervention);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la clôture de l'intervention {Id}", id);
+                return StatusCode(500, "Erreur lors de la clôture");
+            }
+        }
+
     }
 }

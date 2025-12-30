@@ -2,10 +2,9 @@
 {
     public enum ReclamationStatus
     {
-        EnAttente,
-        EnCours,
-        Traitee,
-        Cloturee,
-        Resolue
+        EnAttente,    // Réclamation créée, pas encore d'intervention
+        Planifiée,    // Intervention planifiée
+        EnCours,      // Intervention en cours
+        Terminée      // Intervention terminée → réclamation résolue
     }
 }

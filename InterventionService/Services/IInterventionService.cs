@@ -1,11 +1,13 @@
-﻿using InterventionService.Models;
+﻿using InterventionService.DTOs;
+using InterventionService.Models;
 
 namespace InterventionService.Services
 {
     public interface IInterventionService
     {
-        Task<IEnumerable<Intervention>> GetAllInterventionsAsync();
+        Task<IEnumerable<InterventionListDTO>> GetAllInterventionsAsync();
         Task<Intervention?> GetInterventionByIdAsync(int id);
+        Task<InterventionDTO?> GetInterventionDetailsAsync(int id);
         Task<IEnumerable<Intervention>> GetInterventionsByClientIdAsync(int clientId);
         Task<IEnumerable<Intervention>> GetInterventionsByReclamationIdAsync(int reclamationId);
         Task<Intervention> CreateInterventionAsync(Intervention intervention);
@@ -14,5 +16,9 @@ namespace InterventionService.Services
         Task<InterventionPart> AddPartToInterventionAsync(int interventionId, InterventionPart part);
         Task<bool> RemovePartFromInterventionAsync(int interventionId, int partId);
         Task<decimal> CalculateTotalCostAsync(int interventionId);
+
+        Task<InterventionPart> AddOrUpdatePartAsync(InterventionPart part);
+        Task<bool> DeletePartAsync(int partId);
+        Task<Intervention> CloseInterventionAsync(int interventionId, CloseInterventionDTO dto);
     }
 }

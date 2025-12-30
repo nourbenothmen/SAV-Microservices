@@ -16,9 +16,9 @@ namespace InterventionService.Models
         [StringLength(100)]
         public string NomPiece { get; set; } = string.Empty;
 
-        [Required]
+        
         [StringLength(50)]
-        public string Reference { get; set; } = string.Empty;
+        public string? Reference { get; set; } // ? = nullable, et suppression de [Required]
 
         [Required]
         public int Quantite { get; set; }

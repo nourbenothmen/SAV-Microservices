@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using ArticleService.Models;
+﻿using ArticleService.Models;
+using ArticleService.Models.DTO;
 using ArticleService.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ArticleService.Controllers
 {
@@ -24,7 +26,7 @@ namespace ArticleService.Controllers
         /// GET: api/CustomerArticles
         /// </summary>
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")] // Seulement les admins et managers
+        [Authorize(Roles = "ResponsableSAV")] // Seulement les admins et managers
         [ProducesResponseType(typeof(IEnumerable<CustomerArticle>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -75,7 +77,7 @@ namespace ArticleService.Controllers
         /// GET: api/CustomerArticles/client/5
         /// </summary>
         [HttpGet("client/{clientId}")]
-        [Authorize(Roles = "Admin,Manager,Employee")] // Admins, managers et employés
+        [Authorize(Roles = "ResponsableSAV")]
         [ProducesResponseType(typeof(IEnumerable<CustomerArticle>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -99,7 +101,7 @@ namespace ArticleService.Controllers
         /// GET: api/CustomerArticles/article/5
         /// </summary>
         [HttpGet("article/{articleId}")]
-        [Authorize(Roles = "Admin,Manager")] // Seulement les admins et managers
+        [Authorize(Roles = "ResponsableSAV")]
         [ProducesResponseType(typeof(IEnumerable<CustomerArticle>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -186,7 +188,7 @@ namespace ArticleService.Controllers
         /// POST: api/CustomerArticles
         /// </summary>
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager,Employee")] // Admins, managers et employés
+        [Authorize(Roles = "ResponsableSAV")]
         [ProducesResponseType(typeof(CustomerArticle), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -220,7 +222,7 @@ namespace ArticleService.Controllers
         /// PUT: api/CustomerArticles/5
         /// </summary>
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")] // Seulement les admins et managers
+        [Authorize(Roles = "ResponsableSAV")] // Seulement les admins et managers
         [ProducesResponseType(typeof(CustomerArticle), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -256,7 +258,7 @@ namespace ArticleService.Controllers
         /// DELETE: api/CustomerArticles/5
         /// </summary>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")] // Seulement les admins
+        [Authorize(Roles = "ResponsableSAV")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -301,6 +303,67 @@ namespace ArticleService.Controllers
                 _logger.LogError(ex, "Erreur lors de la vérification de la garantie {Id}", id);
                 return StatusCode(500, new { message = "Une erreur est survenue lors de la vérification de la garantie", error = ex.Message });
             }
+        }
+        /// <summary>
+        /// Récupère les articles appartenant au client connecté (utilisé pour le formulaire de réclamation)
+        /// GET: api/CustomerArticles/my
+        /// </summary>
+        /// <summary>
+        /// Récupère les articles appartenant au client connecté (utilisé pour le formulaire de réclamation)
+        /// GET: api/CustomerArticles/my
+        /// </summary>
+        [HttpGet("my")]
+        [Authorize(Roles = "Client")]
+        [ProducesResponseType(typeof(IEnumerable<MyArticleDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<MyArticleDto>>> GetMyArticles()
+        {
+            try
+            {
+                int clientId = GetClientIdFromClaims();
+
+                _logger.LogInformation("Récupération des articles pour le client ID : {ClientId}", clientId);
+
+                var articles = await _articleService.GetMyArticlesAsync(clientId);
+
+                return Ok(articles);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _logger.LogWarning(ex, "Accès non autorisé à /my - Claim userId manquant ou invalide");
+                return Unauthorized(new { message = "Token invalide ou utilisateur non identifié." });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur serveur lors de la récupération des articles du client connecté");
+                return StatusCode(500, new { message = "Une erreur est survenue lors du chargement de vos articles." });
+            }
+        }
+
+        /// <summary>
+        /// Extrait l'ID du client (ClientId numérique de la table Customers) depuis les claims du JWT
+        /// </summary>
+        /// <returns>L'ID du client sous forme d'entier</returns>
+        /// <exception cref="UnauthorizedAccessException">Si le claim userId n'est pas présent ou invalide</exception>
+        private int GetClientIdFromClaims()
+        {
+            var claim = User.FindFirst("userId");
+
+            if (claim == null)
+            {
+                _logger.LogWarning("Claim 'userId' manquant dans le token pour l'utilisateur {User}", User.Identity?.Name ?? "anonyme");
+                throw new UnauthorizedAccessException("Token invalide ou utilisateur non identifié.");
+            }
+
+            if (!int.TryParse(claim.Value, out int clientId) || clientId <= 0)
+            {
+                _logger.LogWarning("Claim 'userId' invalide (non numérique ou ≤ 0) : {Value}", claim.Value);
+                throw new UnauthorizedAccessException("Token invalide ou utilisateur non identifié.");
+            }
+
+            return clientId;
         }
     }
 }

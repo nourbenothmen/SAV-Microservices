@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ArticleService.Data;
+﻿using ArticleService.Data;
 using ArticleService.Models;
+using ArticleService.Models.DTO;
+using Microsoft.EntityFrameworkCore;
 
 namespace ArticleService.Services
 {
@@ -452,6 +453,29 @@ namespace ArticleService.Services
                 _logger.LogError(ex, "Erreur lors de la vérification de la garantie {CustomerArticleId}", customerArticleId);
                 throw;
             }
+
+
+
+        }
+
+        public async Task<IEnumerable<MyArticleDto>> GetMyArticlesAsync(int clientId)
+        {
+            var customerArticles = await _context.CustomerArticles
+                .Include(ca => ca.Article)
+                .Where(ca => ca.ClientId == clientId)
+                .Select(ca => new MyArticleDto
+                {
+                    CustomerArticleId = ca.Id,
+                    ArticleId = ca.ArticleId,
+                    DisplayName = $"{ca.Article.Marque} - {ca.Article.Nom} - Modèle {ca.Article.Modele}".Trim(),
+                    SerialNumber = ca.NumeroSerie,
+                    EstSousGarantie = ca.EstSousGarantie,
+                    DateFinGarantie = ca.DateFinGarantie
+                })
+                .OrderByDescending(x => x.DateFinGarantie)
+                .ToListAsync();
+
+            return customerArticles;
         }
 
         #endregion

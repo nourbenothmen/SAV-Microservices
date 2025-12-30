@@ -1,5 +1,6 @@
 ﻿// Controllers/ReclamationsController.cs
 using CustomerService.Models;
+using CustomerService.Models.DTOs;
 using CustomerService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +48,37 @@ namespace CustomerService.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPatch("{id}/status")]
+        [Authorize(Roles = "ResponsableSAV")]
+        public async Task<ActionResult<Reclamation>> UpdateReclamationStatus(int id, [FromBody] UpdateStatutDTO dto)
+        {
+            try
+            {
+                var reclamation = await _service.GetReclamationByIdAsync(id);
+                if (reclamation == null)
+                {
+                    return NotFound($"Réclamation avec l'ID {id} non trouvée");
+                }
+
+                // Conversion du string en enum ReclamationStatus
+                if (!Enum.TryParse<ReclamationStatus>(dto.Statut, true, out var newStatus))
+                {
+                    return BadRequest("Statut invalide. Valeurs possibles : EnAttente, Planifiée, EnCours, Résolue, etc.");
+                }
+
+                reclamation.Status = newStatus; // ← Utilise Status (l'enum existant)
+                reclamation.ProcessedAt = DateTime.Now; // ou CreatedAt si tu veux garder une trace
+
+                var updated = await _service.UpdateReclamationAsync(id, reclamation);
+                return Ok(updated);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erreur lors de la mise à jour du statut de la réclamation {Id}", id);
+                return StatusCode(500, "Une erreur est survenue lors de la mise à jour du statut");
             }
         }
 

@@ -4,6 +4,7 @@ using CustomerService.Models.DTOs;
 using CustomerService.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace CustomerService.Controllers
@@ -90,15 +91,22 @@ namespace CustomerService.Controllers
         }
 
         // POST: api/customers
-        [HttpPost]
-        [Authorize(Roles = "Client")]
-        public async Task<ActionResult<CustomerDto>> CreateCustomer([FromBody] CreateCustomerRequest request)
+        [HttpPost("register")]
+        [AllowAnonymous] // Pas de token requis
+        public async Task<ActionResult<CustomerDto>> RegisterCustomer([FromBody] CreateCustomerRequest request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var createdCustomer = await _customerService.CreateCustomerAsync(request);
-            return CreatedAtAction(nameof(GetCustomerById), new { id = createdCustomer.Id }, createdCustomer);
+            try
+            {
+                var createdCustomer = await _customerService.CreateCustomerAsync(request);
+                return CreatedAtAction(nameof(GetCustomerById), new { id = createdCustomer.Id }, createdCustomer);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // PUT: api/customers/{id}
@@ -141,6 +149,44 @@ namespace CustomerService.Controllers
                 return NotFound(new { message = "Client non trouvé ou déjà supprimé." });
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Récupère l'ID numérique du client à partir du UserId (GUID Identity)
+        /// GET: api/customers/client-id?userId=76c3df59-936d-478c-90f4-fc97f76aba93
+        /// </summary>
+        [HttpGet("client-id")]
+        public async Task<ActionResult<int>> GetClientId(string userId)
+        {
+            if (string.IsNullOrEmpty(userId))
+                return BadRequest(new { message = "userId est requis." });
+
+            var customer = await _customerService.GetCustomerByUserIdAsync(userId);
+            if (customer == null)
+                return NotFound(0);
+
+            return Ok(customer.Id);
+        }
+
+        /// <summary>
+        /// Version "me" pour le client connecté
+        /// GET: api/customers/me/client-id
+        /// </summary>
+        [HttpGet("me/client-id")]
+        [Authorize(Roles = "Client")]
+        public async Task<ActionResult<int>> GetMyClientId()
+        {
+            var userId = User.FindFirst("uid")?.Value
+                         ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized(new { message = "UserId non trouvé dans le token." });
+
+            var customer = await _customerService.GetCustomerByUserIdAsync(userId);
+            if (customer == null)
+                return NotFound(0);
+
+            return Ok(customer.Id);
         }
     }
 }
