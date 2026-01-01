@@ -121,7 +121,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Article Service API",
+        Title = "Customer Service API",
         Version = "v1",
         Description = "API pour la gestion des articles sanitaires et de chauffage"
     });
@@ -179,7 +179,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "CustomerService V1");
-        c.RoutePrefix = string.Empty; // Swagger à la racine
+        c.RoutePrefix = "swagger"; // 🔥
     });
 }
 

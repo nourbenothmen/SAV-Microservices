@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Charger Ocelot.json
 // ============================================
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Services.AddSwaggerGen();
 
 // ============================================
 // 2. Config JWT
@@ -70,6 +71,14 @@ builder.Logging.AddConsole();
 builder.Logging.AddDebug();
 
 var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 
 // ============================================
 // 6. Pipeline

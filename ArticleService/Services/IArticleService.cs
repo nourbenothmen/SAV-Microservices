@@ -29,6 +29,6 @@ namespace ArticleService.Services
         Task<CustomerArticle?> UpdateCustomerArticleAsync(int id, CustomerArticle customerArticle);
         Task<bool> DeleteCustomerArticleAsync(int id);
         Task<bool> VerifierGarantieAsync(int customerArticleId);
-        Task<IEnumerable<MyArticleDto>> GetMyArticlesAsync(int clientId);
+        Task<List<MyArticleDto>> GetMyArticlesAsync(int clientId);
     }
 }

@@ -373,5 +373,12 @@ namespace InterventionService.Controllers
             }
         }
 
+        [HttpGet("by-reclamation/{reclamationId}")]
+        public async Task<IActionResult> GetByReclamationId(int reclamationId)
+        {
+            var interventions = await _interventionService.GetInterventionsByReclamationIdAsync(reclamationId);
+            return Ok(interventions);
+        }
+
     }
 }

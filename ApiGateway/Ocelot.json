@@ -293,7 +293,25 @@
       "AddHeadersToRequest": {
         "Authorization": "Bearer {Authorization}"
       }
-
+    },
+    {
+      "DownstreamPathTemplate": "/api/reclamations/{id}/details",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7151
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/reclamations/{id}/details",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/reclamations/{id}/status",
@@ -574,6 +592,7 @@
         "AllowedScopes": []
       }
     },
+
     {
       "DownstreamPathTemplate": "/api/dashboard/client/stats",
       "DownstreamScheme": "https",
@@ -588,6 +607,44 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "Bearer",
         "AllowedScopes": []
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/dashboard/client/recent",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7151
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/dashboard/client/recent",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/interventions/by-reclamation/{reclamationId}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7134
+        }
+      ],
+      "UpstreamPathTemplate": "/apigateway/interventions/by-reclamation/{reclamationId}",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
+      "AddHeadersToRequest": {
+        "Authorization": "Bearer {Authorization}"
       }
     }
 

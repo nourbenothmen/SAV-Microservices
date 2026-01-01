@@ -458,26 +458,31 @@ namespace ArticleService.Services
 
         }
 
-        public async Task<IEnumerable<MyArticleDto>> GetMyArticlesAsync(int clientId)
+        public async Task<List<MyArticleDto>> GetMyArticlesAsync(int clientId)
         {
-            var customerArticles = await _context.CustomerArticles
+            return await _context.CustomerArticles
                 .Include(ca => ca.Article)
                 .Where(ca => ca.ClientId == clientId)
                 .Select(ca => new MyArticleDto
                 {
                     CustomerArticleId = ca.Id,
                     ArticleId = ca.ArticleId,
-                    DisplayName = $"{ca.Article.Marque} - {ca.Article.Nom} - Modèle {ca.Article.Modele}".Trim(),
-                    SerialNumber = ca.NumeroSerie,
-                    EstSousGarantie = ca.EstSousGarantie,
-                    DateFinGarantie = ca.DateFinGarantie
-                })
-                .OrderByDescending(x => x.DateFinGarantie)
-                .ToListAsync();
 
-            return customerArticles;
+                    SerialNumber = ca.NumeroSerie,
+                    DateAchat = ca.DateAchat,                   // ✅ OK
+                    DateFinGarantie = ca.DateFinGarantie,
+
+                    EstSousGarantie = ca.DateFinGarantie > DateTime.Today,
+
+                    // ✅ CONSTRUCTION DU NOM (PAS DisplayName dans Article)
+                    DisplayName = ca.Article != null
+                        ? ca.Article.Nom
+                        : "Article inconnu"
+                })
+                .ToListAsync();
         }
 
+       
         #endregion
     }
 }
